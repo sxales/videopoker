@@ -1,0 +1,42 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+    <title>poker</title>
+    <style>
+      canvas {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        background: transparent;
+      }
+      #background {
+	  	z-index: -2;
+	  }
+	  #sprites {
+	  	z-index: -1;
+	  }
+	  #loading {
+	  	color:white;
+	  }
+    </style>
+  	<link rel="icon"
+  		type="image/png"
+       	href="images/favicon.ico">
+	<script src="ImageRepository.js"></script>
+	<script src="Message.js"></script>
+	<script src="Toolkit.js"></script>
+	<script src="Button.js"></script>
+	<script src="Card.js"></script>
+	<script src="Deck.js"></script>
+	<script src="Hand.js"></script>
+	<script src="Poker.js"></script>
+	<script src="Game.js"></script>
+    <script src="main.js"></script>
+  </head>
+  <body bgcolor="1b5e20" style="margin:0; padding:0">
+  	<div id="loading" align="center">loading . . . </div>
+    <canvas id="sprite">
+    	Your browser does not support canvas. Please try again with a different browser.
+    </canvas>
+  </body>
+</html>
