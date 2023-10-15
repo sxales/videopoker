@@ -4,18 +4,13 @@ var resourceRepository = new function() {
 	this.font = new Image();
 	this.cards = new Image();
 	this.dealer = new Image();
-	this.dealer2 = new Image();
+	this.volume = new Image();
 
 	this.gameover = new Audio();
-	this.levelup = new Audio();
-	this.cleared = new Audio();
-	this.spawn = new Audio();
-	this.acquire = new Audio();
-	this.boom = new Audio();
-	this.schwing = new Audio();
+	this.win = new Audio();
 
 	// Ensure all images have loaded before starting the game
-	var numImages = 11;
+	var numImages = 5;
 	var numLoaded = 0;
 	function imageLoaded() {
 		numLoaded++;
@@ -26,25 +21,10 @@ var resourceRepository = new function() {
 		else document.getElementById("loading").innerHTML = "loading . . . "+Math.round((numLoaded/numImages)*100)+"%";
 	}
 	this.gameover.oncanplay = function() {
-		imageLoaded();
+		//imageLoaded();
 	}
-	this.levelup.oncanplay = function() {
-		imageLoaded();
-	}
-	this.cleared.oncanplay = function() {
-		imageLoaded();
-	}
-	this.spawn.oncanplay = function() {
-		imageLoaded();
-	}
-	this.acquire.oncanplay = function() {
-		imageLoaded();
-	}
-	this.boom.oncanplay = function() {
-		imageLoaded();
-	}
-	this.schwing.oncanplay = function() {
-		imageLoaded();
+	this.win.oncanplay = function() {
+		//imageLoaded();
 	}
 	this.tileSheet.onload = function() {
 		imageLoaded();
@@ -58,26 +38,20 @@ var resourceRepository = new function() {
 	this.dealer.onload = function() {
 		imageLoaded();
 	}
+	this.volume.onload = function() {
+		imageLoaded();
+	}
 
  	// Set images src
 	this.tileSheet.src = "images/tiles.png";
 	this.font.src = "images/font.png";
 	this.cards.src = "images/cards.png";
 	this.dealer.src = "images/dealer_retro.png";
+	this.volume.src = "images/volume.png";
 
 	this.gameover.src = "sounds/gameover.wav";
-	this.levelup.src = "sounds/levelup.wav";
-	this.cleared.src = "sounds/cleared.wav";
-	this.spawn.src = "sounds/heal.wav";
-	this.acquire.src = "sounds/get.wav";
-	this.boom.src = "sounds/boom.wav";
-	this.schwing.src = "sounds/sching.wav";
+	this.win.src = "sounds/get.wav";
 
 	this.gameover.load();
-	this.levelup.load();
-	this.cleared.load();
-	this.spawn.load();
-	this.acquire.load();
-	this.boom.load();
-	this.schwing.load();
+	this.win.load();
 }

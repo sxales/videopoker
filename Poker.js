@@ -1,8 +1,6 @@
 //TODO:
-//INSERT SOUNDS
 //DEALER DIALOG
 //ROYALFLUSH SCENE?
-//SAVING
 
 var Poker = function() {
 	var _width, _height;//in pixels
@@ -42,6 +40,7 @@ var Poker = function() {
 	var btndeal = new Button();
 
 	var btnquit = new Button();
+	var btnmute = new Button();
 
 	var btnincrease = new Button();
 	var btndecrease = new Button();
@@ -105,12 +104,12 @@ var Poker = function() {
 		btndeal.init("deal", _width*SCREENRATIO+(_width*(1-SCREENRATIO)-buttonwidth*2)/2, _height-buttonheight-_fontsize/2, buttonwidth*2, buttonheight);
 		btnconfirm.init("done", _width*SCREENRATIO+(_width*(1-SCREENRATIO)-buttonwidth*2)/2, _height-buttonheight-_fontsize/2, buttonwidth*2, buttonheight);
 		btnquit.init("X", _width-_fontsize*2, 0, _fontsize*2, _fontsize*2);
+		btnmute.init(" ", 0, 0, _fontsize*2, _fontsize*2);
 
 		btnincrease.init("+", _width*SCREENRATIO+(_width*(1-SCREENRATIO)-_fontsize*3)/2, (_height/2-_fontsize*3.5), _fontsize*3, _fontsize*3);
 		btndecrease.init("-", _width*SCREENRATIO+(_width*(1-SCREENRATIO)-_fontsize*3)/2, (_height/2+_fontsize*0.5), _fontsize*3, _fontsize*3);
 
 		setVolume(volume);
-		//if (typeof(Storage) !== "undefined") load();
 
 		_state = TITLE;
 	};
@@ -151,6 +150,7 @@ var Poker = function() {
 		btndraw.check(evt.clientX, evt.clientY);
 		btndeal.check(evt.clientX, evt.clientY);
 		btnquit.check(evt.clientX, evt.clientY);
+		btnmute.check(evt.clientX, evt.clientY);
 		btnconfirm.check(evt.clientX, evt.clientY);
 		btnincrease.check(evt.clientX, evt.clientY);
 		btndecrease.check(evt.clientX, evt.clientY);
@@ -179,15 +179,23 @@ var Poker = function() {
 		if (btnquit.check(inputX, inputY)) {
 			messages.splice(0, messages.length);
 			joker = 0;
+			eraseSave();
 			_state = TITLE;
 		}
+		else if (btnmute.check(inputX, inputY)) mute = !mute;
 		else if (_state == TITLE) {
-			bank = 500;
-			displayedbank = bank;
+			if (typeof(Storage) !== "undefined" && Number(localStorage.getItem("bank")) > 0) {
+				load();
+				_state = DEAL;
+			}
+			else {
+				bank = 500;
+				bet = defaultbet;
+				_state = SETBET;
+			}
 			numberofhands = 0;
-			bet = defaultbet;
+			displayedbank = bank;
 			hold = [ false, false, false, false, false ];
-			_state = SETBET;
 		}
 		else if (_state == SETBET && btnconfirm.check(inputX, inputY)) {
 			_state = DEAL;
@@ -354,7 +362,12 @@ var Poker = function() {
 			writeMessage(ctx, timer, YELLOW, (_width-_fontsize*timer.length)/2, _height-(vpos/2), _fontsize);
 		}
 
-		if (_state > TITLE && _state < GAMEOVER) btnquit.draw(ctx);
+		if (_state > TITLE && _state < GAMEOVER) {
+			btnquit.draw(ctx);
+			btnmute.draw(ctx);
+			if (!mute) ctx.drawImage(resourceRepository.volume, 0, 0, 64, 64, _fontsize/2, _fontsize/2, _fontsize, _fontsize);
+			else ctx.drawImage(resourceRepository.volume, 64, 0, 64, 64, _fontsize/2, _fontsize/2, _fontsize, _fontsize);
+		}
 
 		if (_state == SETBET) {
 			//var fs = cw*5/(25);
@@ -426,12 +439,15 @@ var Poker = function() {
 			var hpos = (_width*SCREENRATIO);
 
 			if (outcome > NOTHING) {
+				if (!mute) resourceRepository.win.play();
 				_nexttick = _tick + 5;
 				messages.push({ timeout: 5, tick: 0, x: hpos, y :vpos, delta: 0, type: LOGO, s: _fontsize, message: txt});//speech bubble
 			}
 			else _nexttick = _tick+2;
 
 			bank += bet*outcome;
+
+			save();
 
 			_state = RESET;
 		}
@@ -441,11 +457,13 @@ var Poker = function() {
 
 			if (bank < bet) {
 				_nexttick = _tick + 25;
+				if (!mute) resourceRepository.gameover.play();
 				_state = GAMEOVER;
 			}
 			else _state = DEAL;
 		}
 		else if (_state == GAMEOVER && _nexttick < _tick) {
+			eraseSave();
 			_state = TITLE;
 		}
 
@@ -501,21 +519,30 @@ var Poker = function() {
 		if (typeof(Storage) !== "undefined") {
 			// Code for localStorage/sessionStorage.
 			localStorage.setItem("bank", bank);
+			localStorage.setItem("bet", bet);
+			return true;
 		}
 		else {
 		  // Sorry! No Web Storage support..
+		  return false;
 		}
 	};
 
 	load = function() {
 		bank = Number(localStorage.getItem("bank"));
+		bet = Number(localStorage.getItem("bet"));
+	};
+
+	eraseSave = function() {
+		localStorage.removeItem("bank");
+		localStorage.removeItem("bet");
 	};
 
 	setVolume = function(v) {
 		volume = v;
 
 		resourceRepository.gameover.volume = volume;
-		resourceRepository.cleared.volume = volume;
+		resourceRepository.win.volume = volume;
 	};
 
 }
